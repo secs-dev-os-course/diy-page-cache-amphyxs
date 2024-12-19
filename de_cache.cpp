@@ -128,7 +128,10 @@ void de_cache_sync(int file_id)
     {
         log("(T_T ) file with id ", file_id, " is outdated in cache, clearing all cached pages");
         file->clear_cached_pages();
-        file->file_size = GetFileSize(file->windows_handle, NULL);
+        file->file_size = GetFileSize(
+            file->windows_handle,
+            NULL // High part of number for big numbers
+        );
     }
     else if (in_cache_than_external == LATER)
     {

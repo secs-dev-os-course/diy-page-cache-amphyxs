@@ -9,12 +9,32 @@ int next_file_id = 1;
 
 CachedFile::CachedFile(const char *file_path)
 {
-    this->windows_handle = CreateFile(cchararr_to_lpcwstr(file_path), GENERIC_ALL, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
-                                      FILE_FLAG_NO_BUFFERING | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+    this->windows_handle = CreateFile(
+        cchararr_to_lpcwstr(file_path),                     // Path to file, must be a type of LPCWSTR
+        GENERIC_ALL,                                        // Desired access to file, here we want to read and write into file
+        FILE_SHARE_READ | FILE_SHARE_WRITE,                 // File sharing mode between processes
+        NULL,                                               // Security attributes, NULL tells to use default security attributes
+        OPEN_EXISTING,                                      // Creating disposition, here will throw error if the file doesn't exist
+        FILE_FLAG_NO_BUFFERING | FILE_FLAG_SEQUENTIAL_SCAN, // Flags and attributes, here we set some flags for OS page caching disabling
+        NULL                                                // Template file, we don't need it
+    );
 
     if (this->windows_handle == INVALID_HANDLE_VALUE)
     {
         throw std::runtime_error("Error opening the file");
+    }
+
+    // Obtain file information
+    BY_HANDLE_FILE_INFORMATION file_info;
+    if (GetFileInformationByHandle(this->windows_handle, &file_info))
+    {
+        // Combine volume serial number and file index to form a unique file ID
+        this->file_id = (static_cast<uint64_t>(file_info.nFileIndexHigh) << 32) | file_info.nFileIndexLow;
+    }
+    else
+    {
+        // Fallback to incrementing ID if unique file ID cannot be determined
+        this->file_id = next_file_id++;
     }
 
     this->file_id = next_file_id++;
@@ -40,9 +60,20 @@ void CachedFile::read_page_from_disk(int page_index)
     std::vector<char> page_data(PAGE_SIZE);
     DWORD bytes_read;
 
-    SetFilePointer(this->windows_handle, page_index * PAGE_SIZE, NULL, FILE_BEGIN);
+    SetFilePointer(
+        this->windows_handle,   // Handle of target file
+        page_index * PAGE_SIZE, // Pointer position
+        NULL,                   // High part of number pointer position, used for long numbers
+        FILE_BEGIN              // Move method, we want to calculate pointer position from file start
+    );
 
-    if (!ReadFile(this->windows_handle, page_data.data(), PAGE_SIZE, &bytes_read, NULL))
+    if (!ReadFile(
+            this->windows_handle, // File to read handle
+            page_data.data(),     // Where to read
+            PAGE_SIZE,            // How much to read
+            &bytes_read,          // Total bytes read for checking
+            NULL                  // Pointer to OVERLAPPED struct, we don't need it
+            ))
     {
         throw std::runtime_error("Failed to read file: " + get_windows_error_message());
     }
@@ -54,7 +85,14 @@ void CachedFile::read_page_from_disk(int page_index)
 
 LPCWSTR CachedFile::cchararr_to_lpcwstr(const char *cchararr)
 {
-    int length = MultiByteToWideChar(CP_UTF8, 0, cchararr, -1, NULL, 0);
+    int length = MultiByteToWideChar(
+        CP_UTF8,  // Encoding of char
+        0,        // Flags
+        cchararr, // String to convert
+        -1,       // Marks the string as null-terminated
+        NULL,     // Pointer to a buffer that receives the converted string
+        0         // 0 tells the function to return a desired buffer size
+    );
     wchar_t *result = new wchar_t[length];
     MultiByteToWideChar(CP_UTF8, 0, cchararr, -1, result, length);
     return result;
