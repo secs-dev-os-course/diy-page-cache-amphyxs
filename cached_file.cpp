@@ -37,7 +37,6 @@ CachedFile::CachedFile(const char *file_path)
         this->file_id = next_file_id++;
     }
 
-    this->file_id = next_file_id++;
     this->position = 0;
     this->file_size = GetFileSize(this->windows_handle, NULL);
     update_last_modification_time();
