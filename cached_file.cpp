@@ -3,6 +3,7 @@
 #include "consts.cpp"
 
 #include <stdexcept>
+#include <memory>
 
 std::unordered_map<int, CachedFile *> cache;
 int next_file_id = 1;
@@ -80,9 +81,9 @@ void CachedFile::read_page_from_disk(size_t page_index)
         throw std::runtime_error("Failed to read file: " + get_windows_error_message());
     }
 
-    Page *page = new Page(page_index, this);
+    std::unique_ptr<Page> page = std::make_unique<Page>(page_index, this);
     page->set_data(std::move(page_data));
-    this->pages[page_index] = page;
+    this->pages[page_index] = std::move(page);
 }
 
 LPCWSTR CachedFile::cchararr_to_lpcwstr(const char *cchararr)
@@ -117,8 +118,8 @@ void CachedFile::load_or_initialize_page(size_t page_index)
 
     if (start_byte > this->file_size)
     {
-        Page *new_page = new Page(page_index, this);
-        this->pages[page_index] = new_page;
+        std::unique_ptr<Page> new_page = std::make_unique<Page>(page_index, this);
+        this->pages[page_index] = std::move(new_page);
         this->file_size += PAGE_SIZE;
     }
     else
@@ -136,7 +137,7 @@ void CachedFile::clear_cached_pages()
 {
     while (!this->pages.empty())
     {
-        delete this->pages.begin()->second;
+        this->pages.begin()->second.reset();
     }
 }
 

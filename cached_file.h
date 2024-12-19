@@ -2,13 +2,14 @@
 #include <unordered_map>
 #include <Windows.h>
 #include "page.h"
+#include <memory>
 
 class Page;
 
 class CachedFile
 {
 public:
-    std::unordered_map<int, Page *> pages;
+    std::unordered_map<int, std::unique_ptr<Page>> pages;
     int file_id;           // Unique ID for the file in the cache
     HANDLE windows_handle; // Windows file handle for operations
     int position;
