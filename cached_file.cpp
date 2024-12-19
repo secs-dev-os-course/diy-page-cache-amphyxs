@@ -60,12 +60,15 @@ void CachedFile::read_page_from_disk(size_t page_index)
     std::vector<char> page_data(PAGE_SIZE);
     DWORD bytes_read;
 
-    SetFilePointer(
-        this->windows_handle,   // Handle of target file
-        page_index * PAGE_SIZE, // Pointer position
-        NULL,                   // High part of number pointer position, used for long numbers
-        FILE_BEGIN              // Move method, we want to calculate pointer position from file start
-    );
+    if (SetFilePointer(
+            this->windows_handle,   // Handle of target file
+            page_index * PAGE_SIZE, // Pointer position
+            NULL,                   // High part of number pointer position, used for long numbers
+            FILE_BEGIN              // Move method, we want to calculate pointer position from file start
+            ) == INVALID_SET_FILE_POINTER)
+    {
+        throw std::runtime_error("Failed to set file pointer while reading file: " + get_windows_error_message());
+    }
 
     if (!ReadFile(
             this->windows_handle, // File to read handle
