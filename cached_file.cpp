@@ -53,7 +53,7 @@ CachedFile::~CachedFile()
     log("destroy file id: ", this->file_id);
 }
 
-void CachedFile::read_page_from_disk(int page_index)
+void CachedFile::read_page_from_disk(size_t page_index)
 {
     log("(x_x ) cache miss, page id: ", page_index);
 
@@ -109,7 +109,7 @@ CachedFile *CachedFile::get_file_by_id(int id)
     return it->second;
 }
 
-void CachedFile::load_or_initialize_page(int page_index)
+void CachedFile::load_or_initialize_page(size_t page_index)
 {
     int start_byte = page_index * PAGE_SIZE;
 

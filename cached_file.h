@@ -19,11 +19,11 @@ public:
 
     ~CachedFile();
 
-    void read_page_from_disk(int page_index);
+    void read_page_from_disk(size_t page_index);
 
     static CachedFile *get_file_by_id(int id);
 
-    void load_or_initialize_page(int page_index);
+    void load_or_initialize_page(size_t page_index);
 
     void update_last_modification_time();
 

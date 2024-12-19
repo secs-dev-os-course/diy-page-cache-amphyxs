@@ -69,9 +69,9 @@ size_t de_cache_write(int file_id, const char *data, size_t size)
 
     while (bytes_written_total < size)
     {
-        int page_index = offset / PAGE_SIZE;
-        int page_offset = offset % PAGE_SIZE;
-        int bytes_to_write = _min(PAGE_SIZE - page_offset, size - bytes_written_total);
+        size_t page_index = offset / PAGE_SIZE;
+        size_t page_offset = offset % PAGE_SIZE;
+        size_t bytes_to_write = _min(PAGE_SIZE - page_offset, size - bytes_written_total);
 
         log("writing ", bytes_written_total, "/", size, " bytes");
 
