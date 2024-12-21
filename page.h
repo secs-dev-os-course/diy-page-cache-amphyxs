@@ -2,12 +2,9 @@
 #include <vector>
 #include "cached_file.h"
 
-class Page
+class Page final
 {
 public:
-    int index;
-    CachedFile *file;
-
     Page(int id, CachedFile *file);
 
     ~Page();
@@ -26,4 +23,8 @@ protected:
     bool check_pages_limit_exceeded();
 
     void free_mru_page();
+
+private:
+    int index;
+    CachedFile *file;
 };

@@ -7,7 +7,7 @@
 
 class Page;
 
-class CachedFile
+class CachedFile final
 {
 public:
     std::unordered_map<int, std::unique_ptr<Page>> pages;
