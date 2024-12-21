@@ -34,20 +34,19 @@ enum TimeComparison
     LATER
 };
 
-TimeComparison compare_times(const FILETIME &ft1, const FILETIME &ft2)
+TimeComparison compare_times(std::chrono::time_point<std::chrono::steady_clock> &tp1, const FILETIME &ft2)
 {
-    // Convert FILETIME to LARGE_INTEGER for comparison
-    LARGE_INTEGER li1, li2;
-    li1.LowPart = ft1.dwLowDateTime;
-    li1.HighPart = ft1.dwHighDateTime;
-    li2.LowPart = ft2.dwLowDateTime;
-    li2.HighPart = ft2.dwHighDateTime;
+    // Convert FILETIME to std::chrono::steady_clock::time_point for comparison
+    ULARGE_INTEGER uli;
+    uli.LowPart = ft2.dwLowDateTime;
+    uli.HighPart = ft2.dwHighDateTime;
+    auto tp2 = std::chrono::time_point<std::chrono::steady_clock>(std::chrono::nanoseconds(uli.QuadPart * 100));
 
-    if (li1.QuadPart < li2.QuadPart)
+    if (tp1 < tp2)
     {
         return EARLIER;
     }
-    else if (li1.QuadPart == li2.QuadPart)
+    else if (tp1 == tp2)
     {
         return SAME;
     }

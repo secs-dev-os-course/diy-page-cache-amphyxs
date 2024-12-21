@@ -5,6 +5,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <sstream>
+#include <chrono>
 #include "de_cache.h"
 #include "util.cpp"
 #include "page.cpp"
@@ -122,16 +123,13 @@ void de_cache_sync(int file_id)
         throw std::runtime_error("Error getting file time");
     }
 
-    TimeComparison in_cache_than_external = compare_times(file->last_modification_in_cache, external_last_modification);
+    auto in_cache_than_external = compare_times(file->last_modification_in_cache, external_last_modification);
 
     if (in_cache_than_external == EARLIER)
     {
         log("(T_T ) file with id ", file_id, " is outdated in cache, clearing all cached pages");
         file->clear_cached_pages();
-        file->file_size = GetFileSize(
-            file->windows_handle,
-            NULL // High part of number for big numbers
-        );
+        file->file_size = GetFileSize(file->windows_handle, NULL);
     }
     else if (in_cache_than_external == LATER)
     {

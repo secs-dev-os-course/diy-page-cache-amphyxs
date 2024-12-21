@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "page.h"
 #include <memory>
+#include <chrono>
 
 class Page;
 
@@ -14,7 +15,7 @@ public:
     HANDLE windows_handle; // Windows file handle for operations
     int position;
     int file_size;
-    FILETIME last_modification_in_cache;
+    std::chrono::time_point<std::chrono::steady_clock> last_modification_in_cache;
 
     CachedFile(const char *file_path);
 

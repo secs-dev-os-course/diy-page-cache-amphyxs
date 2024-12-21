@@ -4,6 +4,7 @@
 
 #include <stdexcept>
 #include <memory>
+#include <chrono>
 
 std::unordered_map<int, CachedFile *> cache;
 int next_file_id = 1;
@@ -130,7 +131,7 @@ void CachedFile::load_or_initialize_page(size_t page_index)
 
 void CachedFile::update_last_modification_time()
 {
-    GetSystemTimeAsFileTime(&this->last_modification_in_cache);
+    this->last_modification_in_cache = std::chrono::steady_clock::now();
 }
 
 void CachedFile::clear_cached_pages()
