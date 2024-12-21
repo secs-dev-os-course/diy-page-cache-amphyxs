@@ -125,19 +125,19 @@ void de_cache_sync(int file_id)
 
     auto in_cache_than_external = compare_times(file->last_modification_in_cache, external_last_modification);
 
-    if (in_cache_than_external == EARLIER)
+    switch (in_cache_than_external)
     {
+    case EARLIER:
         log("(T_T ) file with id ", file_id, " is outdated in cache, clearing all cached pages");
         file->clear_cached_pages();
         file->file_size = GetFileSize(file->windows_handle, NULL);
-    }
-    else if (in_cache_than_external == LATER)
-    {
+        break;
+    case LATER:
         log("(`^` ) file with id ", file_id, " is newer than on disk, uploading all cached pages on the disk");
         file->upload_cache_on_disk();
-    }
-    else
-    {
+        break;
+    case SAME:
         log("(^v^ ) file with id ", file_id, " is up to date to the disk version");
+        break;
     }
 }
