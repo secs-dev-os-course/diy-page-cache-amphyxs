@@ -37,7 +37,7 @@ size_t de_cache_read(int file_id, char *buffer, size_t size)
     {
         int page_index = offset / PAGE_SIZE;
         int page_offset = offset % PAGE_SIZE;
-        int bytes_to_read = _min(PAGE_SIZE - page_offset, size - bytes_read_total);
+        int bytes_to_read = _min(cached_file->file_size - page_index * PAGE_SIZE, _min(PAGE_SIZE - page_offset, size - bytes_read_total));
 
         log("reading ", bytes_read_total, "/", size, " bytes");
 
@@ -45,7 +45,7 @@ size_t de_cache_read(int file_id, char *buffer, size_t size)
         if (page_it == cached_file->pages.end())
         {
             // Page not in cache
-            cached_file->read_page_from_disk(page_index);
+            cached_file->read_page_from_disk(page_index, bytes_to_read);
             page_it = cached_file->pages.find(page_index);
         }
 

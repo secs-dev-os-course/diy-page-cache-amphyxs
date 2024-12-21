@@ -51,11 +51,11 @@ CachedFile::~CachedFile()
     log("destroy file id: ", this->file_id);
 }
 
-void CachedFile::read_page_from_disk(size_t page_index)
+void CachedFile::read_page_from_disk(size_t page_index, size_t bytes_to_read)
 {
     log("(x_x ) cache miss, page id: ", page_index);
 
-    std::vector<char> page_data(PAGE_SIZE);
+    std::vector<char> page_data(bytes_to_read);
     DWORD bytes_read;
 
     if (SetFilePointer(
@@ -71,7 +71,7 @@ void CachedFile::read_page_from_disk(size_t page_index)
     if (!ReadFile(
             this->windows_handle, // File to read handle
             page_data.data(),     // Where to read
-            PAGE_SIZE,            // How much to read
+            bytes_to_read,        // How much to read
             &bytes_read,          // Total bytes read for checking
             NULL                  // Pointer to OVERLAPPED struct, we don't need it
             ))
@@ -122,7 +122,7 @@ void CachedFile::load_or_initialize_page(size_t page_index)
     }
     else
     {
-        read_page_from_disk(page_index);
+        read_page_from_disk(page_index, PAGE_SIZE);
     }
 }
 

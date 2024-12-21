@@ -21,7 +21,7 @@ public:
 
     ~CachedFile();
 
-    void read_page_from_disk(size_t page_index);
+    void read_page_from_disk(size_t page_index, size_t bytes_to_read);
 
     static CachedFile *get_file_by_id(int id);
 
