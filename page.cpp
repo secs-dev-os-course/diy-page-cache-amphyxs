@@ -42,7 +42,7 @@ const std::vector<char> &Page::get_data()
 void Page::set_data(std::vector<char> data)
 {
     mark_as_mru();
-    this->data = data;
+    this->data = std::move(data);
 }
 
 void Page::set_data(const char *data, size_t offset, size_t size)
