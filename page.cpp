@@ -33,7 +33,7 @@ void Page::mark_as_mru()
     log("MRU page index: ", index);
 }
 
-std::vector<char> Page::get_data()
+const std::vector<char> &Page::get_data()
 {
     mark_as_mru();
     return this->data;
@@ -43,6 +43,12 @@ void Page::set_data(std::vector<char> data)
 {
     mark_as_mru();
     this->data = data;
+}
+
+void Page::set_data(const char *data, size_t offset, size_t size)
+{
+    mark_as_mru();
+    memcpy(this->data.data() + offset, data, size);
 }
 
 bool Page::check_pages_limit_exceeded()

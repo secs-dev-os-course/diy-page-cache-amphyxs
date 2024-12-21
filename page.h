@@ -11,20 +11,20 @@ public:
 
     void mark_as_mru();
 
-    std::vector<char> get_data();
+    const std::vector<char> &get_data();
 
     void set_data(std::vector<char> data);
 
+    void set_data(const char *data, size_t offset, size_t size);
+
     void upload_to_disk();
 
-protected:
+private:
+    int index;
+    CachedFile *file;
     std::vector<char> data;
 
     bool check_pages_limit_exceeded();
 
     void free_mru_page();
-
-private:
-    int index;
-    CachedFile *file;
 };

@@ -87,7 +87,7 @@ size_t de_cache_write(int file_id, const char *data, size_t size)
 
         // Write data to the cache page
         log("writing bytes [", page_offset, "-", page_offset + bytes_to_write, "] to page index: ", page_index);
-        memcpy(page_it->second->get_data().data() + page_offset, data + bytes_written_total, bytes_to_write);
+        page_it->second->set_data(data + bytes_written_total, page_offset, bytes_to_write);
         cached_file->update_last_modification_time();
 
         bytes_written_total += bytes_to_write;
