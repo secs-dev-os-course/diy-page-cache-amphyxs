@@ -14,6 +14,8 @@
 int de_cache_open(const char *path)
 {
     CachedFile *cached_file = new CachedFile(path);
+
+    cache[cached_file->file_id] = cached_file;
     log("create empty cached file, id: ", cached_file->file_id, ", path: ", path);
 
     return cached_file->file_id;
@@ -111,7 +113,9 @@ void de_cache_set_file_position(int file_id, int position)
 
 void de_cache_close(int file_id)
 {
-    delete CachedFile::get_file_by_id(file_id);
+    CachedFile *file_to_close = CachedFile::get_file_by_id(file_id);
+    cache.erase(file_to_close->file_id);
+    delete file_to_close;
 }
 
 void de_cache_sync(int file_id)

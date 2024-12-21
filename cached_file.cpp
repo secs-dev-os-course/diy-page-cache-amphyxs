@@ -42,14 +42,11 @@ CachedFile::CachedFile(const char *file_path)
     this->position = 0;
     this->file_size = GetFileSize(this->windows_handle, NULL);
     update_last_modification_time();
-
-    cache[this->file_id] = this;
 }
 
 CachedFile::~CachedFile()
 {
     clear_cached_pages();
-    cache.erase(this->file_id);
     CloseHandle(this->windows_handle);
     log("destroy file id: ", this->file_id);
 }
