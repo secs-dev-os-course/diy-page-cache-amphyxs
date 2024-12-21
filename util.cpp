@@ -17,7 +17,7 @@ void log(Args... args)
     std::cout << "[de_cache]: " << stream.str() << std::endl;
 }
 
-int ceil(int a, int b)
+int divide_ceiled(int a, int b)
 {
     return (a + b - 1) / b;
 }
